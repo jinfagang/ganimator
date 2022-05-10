@@ -146,7 +146,7 @@ def main():
     motion_data.write(pjoin(save_path, f'result.bvh'), imgs[-1])
 
     # try don't do contact fix
-    # fix_contact_on_file(save_path, name=f'result')
+    fix_contact_on_file(save_path, name=f'result')
 
 
 if __name__ == '__main__':

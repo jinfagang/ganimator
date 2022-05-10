@@ -1,4 +1,3 @@
-from bvh.bvh_parser import BVH_file
 from os.path import join as pjoin
 import numpy as np
 import torch
@@ -7,6 +6,7 @@ from models.kinematics import InverseKinematicsJoint2
 from models.transforms import repr6d2quat
 from tqdm import tqdm
 import argparse
+from nosmpl.parsers.bvh_parser import BVH_file
 
 
 def continuous_filter(contact, length=2):
@@ -68,7 +68,7 @@ def fix_contact_on_file(prefix, name):
     bvh_file = BVH_file(pjoin(prefix, name + '.bvh'), no_scale=True, requires_contact=True)
     print('Fixing foot contact with IK...')
     res = fix_contact(bvh_file, contact)
-    bvh_file.writer.write(pjoin(prefix, name + '_fixed.bvh'), res[0], res[1], names=bvh_file.skeleton.names, repr='quat')
+    bvh_file.writer.write(pjoin(prefix, name + '_fixed.bvh'), res[0], res[1], names=bvh_file.skeleton.names_mixamo, repr='quat')
 
 
 if __name__ == '__main__':
