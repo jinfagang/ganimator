@@ -6,6 +6,7 @@ from models import create_model, create_layered_model
 from models.architecture import draw_example, get_pyramid_lengths, FullGenerator
 from option import TestOptionParser, TrainOptionParser
 from fix_contact import fix_contact_on_file
+from pprint import pprint
 
 
 def load_all_from_path(save_path, device, use_class=False):
@@ -91,6 +92,7 @@ def gen_noise(n_channel, length, full_noise, device):
 def main():
     test_parser = TestOptionParser()
     test_args = test_parser.parse_args()
+    pprint(test_args)
 
     args, multiple_data, gens, z_stars, amps, lengths = load_all_from_path(test_args.save_path, test_args.device)
     device = torch.device(args.device)
@@ -121,9 +123,9 @@ def main():
         motion_data.write(pjoin(save_path, f'gt_{i}.bvh'), real)
         motion_data.write(pjoin(save_path, f'rec_{i}.bvh'), imgs[-1])
 
-        if imgs[-1].shape[-1] == real.shape[-1]:
-            rec_loss = torch.nn.MSELoss()(imgs[-1], real).detach().cpu().numpy()
-            print(f'rec_loss: {rec_loss.item():.07f}')
+        # if imgs[-1].shape[-1] == real.shape[-1]:
+        #     rec_loss = torch.nn.MSELoss()(imgs[-1], real).detach().cpu().numpy()
+        #     print(f'rec_loss: {rec_loss.item():.07f}')
 
     target_len = test_args.target_length
     target_length = get_pyramid_lengths(args, target_len)
@@ -139,8 +141,12 @@ def main():
 
     imgs = draw_example(gens, 'random', z_stars[base_id], target_length, amps2, 1, args, all_img=True,
                         conds=None, full_noise=args.full_noise, given_noise=[z_target])
+    
+    print(imgs[0].shape, len(imgs))
     motion_data.write(pjoin(save_path, f'result.bvh'), imgs[-1])
-    fix_contact_on_file(save_path, name=f'result')
+
+    # try don't do contact fix
+    # fix_contact_on_file(save_path, name=f'result')
 
 
 if __name__ == '__main__':

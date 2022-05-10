@@ -3,11 +3,13 @@ from os.path import join as pjoin
 import numpy as np
 import torch
 import torch.nn.functional as F
-from bvh.bvh_parser import BVH_file
+# from bvh.bvh_parser import BVH_file
 from models.transforms import interpolate_6d
 from models.utils import gaussian_filter_wrapper
 from bvh.bvh_writer import WriterWrapper
-
+from alfred import print_shape
+from alfred import logger
+from nosmpl.parsers.bvh_parser import BVH_file
 
 class MotionData:
     def __init__(self, filename, repr='quat', padding=False,
@@ -125,9 +127,11 @@ class MotionData:
 
     def write(self, filename, motion):
         pos, rot, contact = self.parse(motion)
+        print_shape(pos, rot, contact)
         if self.contact:
             np.save(filename + '.contact', contact.detach().cpu().numpy())
-        self.writer.write(filename, rot, pos, names=self.bvh_file.skeleton.names, repr=self.repr)
+        logger.info(f'start saving bvh. {self.bvh_file.skeleton.names}')
+        self.writer.write(filename, rot, pos, names=self.bvh_file.skeleton.names_mixamo, repr=self.repr)
 
     def __len__(self):
         return self.raw_motion.shape[-1]
